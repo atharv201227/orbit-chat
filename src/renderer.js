@@ -4,6 +4,27 @@ const messagesEl = $('#messages');
 const composer = $('#composer');
 const sendBtn = $('#sendBtn');
 
+function notify(message, kind = 'info') {
+  let toast = $('#orbitToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'orbitToast';
+    toast.className = 'orbit-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.dataset.kind = kind;
+  toast.classList.add('visible');
+  clearTimeout(notify.timer);
+  notify.timer = setTimeout(() => toast.classList.remove('visible'), 3200);
+}
+
+function on(selector, event, handler) {
+  const element = $(selector);
+  if (!element) return;
+  element.addEventListener(event, handler);
+}
+
 function setConnection(online, detail) {
   state.online = online;
   const card = $('#connectionCard');
@@ -67,12 +88,14 @@ async function refresh() {
     if (status.online) {
       state.models = await window.ollama.models();
       renderModels();
+      notify(state.models.length ? `${state.models.length} local model${state.models.length === 1 ? '' : 's'} ready` : 'Ollama is running, but no models are installed', state.models.length ? 'success' : 'info');
     } else {
       state.models = [];
       renderModels();
     }
   } catch (error) {
     setConnection(false, 'Start the local runtime to continue');
+    notify(`Could not connect to Ollama: ${error.message || 'runtime unavailable'}`, 'error');
   } finally { $('#refreshBtn').textContent = '↻'; }
 }
 
@@ -101,25 +124,33 @@ async function sendMessage(prefill) {
   } finally { sendBtn.disabled = false; }
 }
 
-$('#newChatBtn').addEventListener('click', resetChat);
-$('#refreshBtn').addEventListener('click', refresh);
-$('#installBtn').addEventListener('click', async () => {
+on('#newChatBtn', 'click', resetChat);
+on('#refreshBtn', 'click', refresh);
+on('#installBtn', 'click', async () => {
   const button = $('#installBtn');
   button.disabled = true;
   button.innerHTML = 'Installing…';
   try {
     await window.ollama.install();
+    notify('Ollama installed. Checking the local runtime…', 'success');
     await refresh();
   } catch (error) {
     button.disabled = false;
     button.innerHTML = 'Open Ollama download ↗';
+    notify('Automatic installation was blocked. Opening the official Ollama download page.', 'error');
     window.ollama.openDownload();
   }
 });
-$('#sendBtn').addEventListener('click', () => sendMessage());
-$('#modelSelect').addEventListener('change', (event) => { state.selectedModel = event.target.value; sendBtn.disabled = !state.online || !state.selectedModel; });
-composer.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); } });
-composer.addEventListener('input', () => { composer.style.height = 'auto'; composer.style.height = `${Math.min(composer.scrollHeight, 130)}px`; });
-document.querySelectorAll('.starter-card').forEach((card) => card.addEventListener('click', () => { composer.value = card.dataset.prompt; composer.focus(); if (state.online && state.selectedModel) sendMessage(); }));
+on('#sendBtn', 'click', () => sendMessage());
+on('#modelSelect', 'change', (event) => { state.selectedModel = event.target.value; sendBtn.disabled = !state.online || !state.selectedModel; notify(state.selectedModel ? `Using ${state.selectedModel}` : 'Choose an installed model first'); });
+on('#modelsNav', 'click', () => { refresh(); $('#modelSelect').focus(); notify('Model list refreshed'); });
+on('#composer', 'keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); } });
+on('#composer', 'input', () => { composer.style.height = 'auto'; composer.style.height = `${Math.min(composer.scrollHeight, 130)}px`; });
+document.querySelectorAll('.starter-card').forEach((card) => card.addEventListener('click', () => { composer.value = card.dataset.prompt; composer.focus(); if (state.online && state.selectedModel) sendMessage(); else notify('Install Ollama and select a model to use this prompt'); }));
+document.querySelectorAll('.history-item').forEach((item) => item.addEventListener('click', () => { document.querySelectorAll('.history-item').forEach((entry) => entry.classList.remove('active')); item.classList.add('active'); notify(`Opened ${item.textContent.trim()}`); }));
+document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach((entry) => entry.classList.remove('active')); item.classList.add('active'); }));
+document.querySelectorAll('.icon-button').forEach((button) => button.addEventListener('click', () => notify(button.title === 'Search' ? 'Search is coming soon' : 'Settings and commands are coming soon')));
+document.querySelector('.tool-button')?.addEventListener('click', () => notify('File attachments are coming soon'));
+window.addEventListener('error', (event) => notify(`Orbit UI error: ${event.message}`, 'error'));
 
 refresh();

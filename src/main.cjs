@@ -45,6 +45,7 @@ function checkOllamaInstalled() {
 function startOllama() {
   return new Promise((resolve) => {
     const child = spawn(ollamaBinary(), ['serve'], { detached: true, stdio: 'ignore', windowsHide: true });
+    child.once('error', (error) => resolve({ started: false, error: error.message }));
     child.unref();
     setTimeout(() => resolve({ started: true }), 700);
   });
