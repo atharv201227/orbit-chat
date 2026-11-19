@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbit Chat</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-row">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div><div class="brand-name">Orbit</div><div class="brand-sub">LOCAL AI STUDIO</div></div>
+      </div>
+      <button class="new-chat" id="newChatBtn"><span>＋</span> New conversation <kbd>⌘ K</kbd></button>
+      <div class="sidebar-section-label">Workspace</div>
+      <nav class="nav-list">
+        <button class="nav-item active"><span class="nav-icon">◈</span> Chat <span class="nav-count">1</span></button>
+        <button class="nav-item" id="modelsNav"><span class="nav-icon">◌</span> Models</button>
+        <button class="nav-item"><span class="nav-icon">⌁</span> Prompt library</button>
+      </nav>
+      <div class="sidebar-section-label history-label">Recent</div>
+      <div class="history-list" id="historyList">
+        <button class="history-item active"><span class="history-dot"></span><span>Untitled conversation</span><span class="more">•••</span></button>
+        <button class="history-item"><span class="history-dot muted"></span><span>Understanding embeddings</span></button>
+        <button class="history-item"><span class="history-dot muted"></span><span>Launch checklist</span></button>
+      </div>
+      <div class="sidebar-footer">
+        <div class="connection-card" id="connectionCard"><span class="status-pip"></span><div><strong id="connectionLabel">Checking Ollama…</strong><small id="connectionDetail">Local runtime</small></div><button id="refreshBtn" title="Refresh connection">↻</button></div>
+        <div class="profile-row"><div class="avatar">AS</div><div><strong>Atharv</strong><small>Personal workspace</small></div><button class="icon-button">⚙</button></div>
+      </div>
+    </aside>
+
+    <main class="main-stage">
+      <header class="topbar">
+        <div class="crumb"><span>Chat</span><span class="slash">/</span><strong id="conversationTitle">Untitled conversation</strong></div>
+        <div class="top-actions"><button class="icon-button" title="Search">⌕</button><button class="icon-button" title="Command menu">⌘</button><div class="window-dot"></div></div>
+      </header>
+
+      <section class="chat-stage">
+        <div class="chat-column" id="chatColumn">
+          <div class="welcome-block" id="welcomeBlock">
+            <div class="eyebrow"><span class="eyebrow-line"></span>PRIVATE BY DESIGN</div>
+            <h1>Think locally.<br><em>Move freely.</em></h1>
+            <p>Your conversations stay on this device. Choose a model, ask anything, and keep your work in your orbit.</p>
+            <div class="starter-grid">
+              <button class="starter-card" data-prompt="Explain a complex idea in simple terms"><span class="starter-icon amber">✦</span><span><strong>Make it simple</strong><small>Explain a complex idea in simple terms</small></span><span class="arrow">↗</span></button>
+              <button class="starter-card" data-prompt="Help me plan my next project"><span class="starter-icon violet">▱</span><span><strong>Start a project</strong><small>Turn a rough idea into a clear plan</small></span><span class="arrow">↗</span></button>
+              <button class="starter-card" data-prompt="Review this idea and suggest improvements"><span class="starter-icon mint">◎</span><span><strong>Get a second opinion</strong><small>Review an idea and suggest improvements</small></span><span class="arrow">↗</span></button>
+            </div>
+          </div>
+          <div class="messages" id="messages" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <footer class="composer-wrap">
+        <div class="setup-banner hidden" id="setupBanner"><div class="setup-symbol">!</div><div><strong>Ollama is not connected</strong><span>Install Ollama to run private models on your device.</span></div><button id="installBtn">Install Ollama <span>↗</span></button></div>
+        <div class="composer-shell">
+          <textarea id="composer" rows="1" placeholder="Message your local model…" aria-label="Message your local model"></textarea>
+          <div class="composer-toolbar"><div class="toolbar-left"><button class="tool-button" title="Attach file">＋</button><span class="model-label">Using</span><select id="modelSelect"><option value="">No model selected</option></select><span class="runtime-badge"><span></span> Local</span></div><button class="send-button" id="sendBtn" title="Send message">↑</button></div>
+        </div>
+        <div class="composer-note">Orbit can make mistakes. Your data never leaves this device.</div>
+      </footer>
+    </main>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
