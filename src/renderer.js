@@ -110,7 +110,7 @@ async function sendMessage(prefill) {
   sendBtn.disabled = true;
   const loading = document.createElement('div');
   loading.className = 'message assistant';
-  loading.innerHTML = '<div class="message-avatar">✦</div><div class="message-body"><div class="message-meta">ORBIT · THINKING</div><div class="message-content" style="color:#7f8993">Working locally…</div></div>';
+  loading.innerHTML = '<div class="message-avatar">✦</div><div class="message-body"><div class="message-meta">ORBIT · THINKING</div><div class="message-content" style="color:#7f8993">Loading the model and generating a local response…</div></div>';
   messagesEl.appendChild(loading);
   try {
     const reply = await window.ollama.chat({ model: state.selectedModel, messages: state.messages });

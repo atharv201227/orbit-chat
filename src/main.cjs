@@ -11,7 +11,7 @@ function requestJson(pathname, options = {}) {
     const req = http.request(`${OLLAMA_URL}${pathname}`, {
       method: options.method || 'GET',
       headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-      timeout: 6000,
+      timeout: options.timeout ?? 6000,
     }, (res) => {
       let raw = '';
       res.setEncoding('utf8');
@@ -111,6 +111,10 @@ ipcMain.handle('ollama:open-download', () => shell.openExternal('https://ollama.
 ipcMain.handle('ollama:install', () => installOllama());
 ipcMain.handle('ollama:start', () => startOllama());
 ipcMain.handle('ollama:chat', async (event, payload) => {
-  const data = await requestJson('/api/chat', { method: 'POST', body: { model: payload.model, messages: payload.messages, stream: false, options: { temperature: 0.7 } } });
+  const data = await requestJson('/api/chat', {
+    method: 'POST',
+    timeout: 300000,
+    body: { model: payload.model, messages: payload.messages, stream: false, options: { temperature: 0.7 } },
+  });
   return data.message || { role: 'assistant', content: '' };
 });
